@@ -92,4 +92,19 @@ class UsersController < ApplicationController
       }.to_json
     end
   end
+
+  def login
+    # POST /users/:username
+    user = User.find_by_username(params[:username])
+    if user and user.password == params[:password]
+      render :json => { 
+        :success => 'true',
+        :data => user
+      }.to_json
+    else
+      render :json => { 
+        :success => 'false', 
+      }.to_json
+    end
+  end
 end
