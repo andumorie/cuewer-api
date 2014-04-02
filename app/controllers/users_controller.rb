@@ -25,13 +25,13 @@ class UsersController < ApplicationController
   def create
     # POST /users
     if params[:password] == params[:confirmpassword]
-      user = User.new
-      user.username = params[:username]
-      user.password = params[:password]
-      user.email = params[:email]
+      u = User.new
+      u.username = params[:username]
+      u.password = params[:password]
+      u.email = params[:email]
       
       saved = false
-      if user.save
+      if u.save
         saved = true
       end
     end
@@ -39,7 +39,7 @@ class UsersController < ApplicationController
     if saved
         render :json => { 
           :success => 'true', 
-          :data => user
+          :data => u
         }.to_json
       else
         render :json => { 
@@ -50,27 +50,27 @@ class UsersController < ApplicationController
 
   def update
     # PUT /users/:id
-    user = User.find(params[:id])
+    u = User.find(params[:id])
     if params[:username]
-      user.username = params[:username]
+      u.username = params[:username]
     end
     if params[:password]
-      user.password = params[:password]
+      u.password = params[:password]
     end
     if params[:email]
-      user.password ||= params[:email]
+      u.password ||= params[:email]
     end
 
 
     saved = false
-    if user.save
+    if u.save
       saved = true
     end
 
     if saved
         render :json => { 
           :success => 'true', 
-          :data => user
+          :data => u
         }.to_json
       else
         render :json => { 
@@ -95,11 +95,11 @@ class UsersController < ApplicationController
 
   def login
     # POST /users/:username
-    user = User.find_by_username(params[:username])
-    if user and user.password == params[:password]
+    u = User.find_by_username(params[:username])
+    if u and u.password == params[:password]
       render :json => { 
         :success => 'true',
-        :data => user
+        :data => u
       }.to_json
     else
       render :json => { 
