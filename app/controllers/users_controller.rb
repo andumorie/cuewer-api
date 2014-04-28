@@ -123,9 +123,9 @@ class UsersController < ApplicationController
       u.code = cod
 
       nexmo = Nexmo::Client.new('81dfd0fe', '7b51e610')
-      # response = nexmo.send_message({:to => params[:number], :from => 'Cuewer', :text => 'Welcome to Cuewer! Your activation code is: ' + cod})
+      response = nexmo.send_message({:to => params[:number], :from => 'Cuewer', :text => 'Welcome to Cuewer! Your activation code is: ' + cod})
 
-      if true #response.ok?
+      if response.ok?
         if u.save
           render :json => { 
             :success => 'true',
