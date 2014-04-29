@@ -2,6 +2,7 @@ require 'nexmo'
 
 class UsersController < ApplicationController
   skip_before_filter :verify_authenticity_token
+  
   def index
     # GET /users
     render :json => { 
@@ -123,7 +124,10 @@ class UsersController < ApplicationController
       u.code = cod
 
       nexmo = Nexmo::Client.new('81dfd0fe', '7b51e610')
-      response = nexmo.send_message({:to => params[:number], :from => 'Cuewer', :text => 'Welcome to Cuewer! Your activation code is: ' + cod})
+      response = nexmo.send_message({ :to => params[:number], 
+                                      :from => 'Cuewer', 
+                                      :text => 'Welcome to Cuewer! Your activation code is: ' + cod
+                                    })
 
       if response.ok?
         if u.save
@@ -163,6 +167,33 @@ class UsersController < ApplicationController
           :success => 'false', 
         }.to_json
       end
+    else
+      render :json => { 
+        :success => 'false', 
+      }.to_json
+    end
+  end
+
+  def get_contacts
+    # GET /users/get_contacts/:username
+    u = User.find_by_username(params[:username])
+    if u
+      params[:numbers].each do |number|
+        f = User.find_by_number(number)
+        # add him as a friend if he's not already
+        if !u.friends.include?(f)
+          u.friends << f
+          u.save
+        end
+        if !f.friends.include?(u)
+          f.friends << u
+          f.save
+        end
+      end
+      render :json => { 
+        :success => 'true',
+        :data => u.friends
+      }.to_json
     else
       render :json => { 
         :success => 'false', 
