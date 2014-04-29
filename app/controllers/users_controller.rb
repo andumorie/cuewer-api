@@ -2,7 +2,7 @@ require 'nexmo'
 
 class UsersController < ApplicationController
   skip_before_filter :verify_authenticity_token
-  
+
   def index
     # GET /users
     render :json => { 
@@ -178,21 +178,24 @@ class UsersController < ApplicationController
     # GET /users/get_contacts/:username
     u = User.find_by_username(params[:username])
     if u
-      params[:numbers].each do |number|
+      numbers = params[:numbers]
+      numbers.each do |number|
         f = User.find_by_number(number)
-        # add him as a friend if he's not already
-        if !u.friends.include?(f)
-          u.friends << f
-          u.save
-        end
-        if !f.friends.include?(u)
-          f.friends << u
-          f.save
+        if f and f.code == '1' and u != f
+          # add him as a friend if he's not already
+          if !u.friends.include?(f)
+            u.friends << f
+            u.save
+          end
+          if !f.friends.include?(u)
+            f.friends << u
+            f.save
+          end
         end
       end
       render :json => { 
         :success => 'true',
-        :data => u.friends
+        :data => u.friends.as_json
       }.to_json
     else
       render :json => { 
